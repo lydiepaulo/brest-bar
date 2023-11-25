@@ -1,13 +1,30 @@
-import styles from '../styles/Home.module.css';
+import { useEffect, useState } from 'react';
+import Bar from './Bar';
+import Navbar from './Navbar';
 
 function Home() {
+  const [bars, setBars] = useState([]);
+
+  useEffect(() => {
+    fetch('https://api.brest.bar/items/bars')
+      .then(response => response.json())
+      .then(data => {
+        setBars(data.data);
+      });
+  }, []);
+
+  console.log(bars);
+
+  const barList = bars.map((data, i) => {
+    return <Bar key={i} {...data} />;
+  });
+
   return (
-    <div>
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-      </main>
+    <div className="ui-primary flex max-h-screen min-h-screen flex-col overflow-hidden bg-ui">
+      <Navbar />
+      <div className=''>
+        {/* {barList} */}
+      </div>
     </div>
   );
 }
