@@ -47,11 +47,29 @@ body {
 	background: var(--primary);
 }
 
+@layer components {
+	.divider {
+		@apply w-full border border-[var(--ui-secondary)];
+	}
+
+	.subtitle {
+		@apply tx-inverted text-2xl font-semibold;
+	}
+
+	.tri-buttons {
+		@apply ui-secondary flex flex-col rounded-2xl gap-2 p-6 my-6 w-1/2 items-center text-lg;
+	}
+}
+
 /*
  * COLORS CLASSES
  */
 .ui-primary {
 	background-color: var(--ui-primary);
+}
+
+.ui-secondary {
+	background-color: var(--ui-secondary);
 }
 
 .bg-primary {
