@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-	--ui-primary: #fff;
+	--ui-primary: #f9f9f9;
 	--ui-secondary: #fff;
 	--inverted: #000000;
 	--light-primary: #b786ee;
-	--primary: #a66aeb;
+	--primary: #b066f3;
 	--dim-primary: #8454bc;
 	--secondary: #b12abf;
 	--tertiary: #4663ca;
@@ -29,6 +29,22 @@ body {
 
 * {
 	box-sizing: border-box;
+	/* scrollbar mozilla */
+	scrollbar-color: var(--primary);
+	scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track-piece {
+	background-color: var(--ui-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--primary);
 }
 
 /*
@@ -42,8 +58,12 @@ body {
 	background-color: var(--primary);
 }
 
-.inverted {
+.tx-inverted {
 	color: var(--inverted);
+}
+
+.tx-primary {
+	color: var(--primary);
 }
 
 .gradient {
