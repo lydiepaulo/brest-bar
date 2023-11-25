@@ -57,7 +57,7 @@ function Home() {
 
       {/* map */}
       <div className="!absolute z-0 top-0 left-0 right-0 w-[100%] h-[100%] bg-gray-secondary mapboxgl-map">
-        <MapBrest />
+        {/* <MapBrest /> */}
       </div>
     </div>
   );

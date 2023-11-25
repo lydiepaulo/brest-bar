@@ -24,11 +24,14 @@ export default function Bar(props) {
     useEffect(() => {
         const openingHours = JSON.parse(props.opening_hours.replace(/'/g, '"'))
 
-        const currentDate = new Date()
-        const currentDay = currentDate.getDay() - 1 // Sunday is 0, Monday is 1, ..., Saturday is 6
+        console.log(openingHours);
 
-        if (openingHours) {
+        const currentDate = new Date()
+        const currentDay = ((currentDate.getDay() + 5) % 7) + 1 // Sunday is 6, Monday is 0
+
+        if (openingHours && openingHours[currentDay]) {
             const today = openingHours[currentDay]
+            console.log(currentDay, today);
             if (today.includes('Fermé')) {
                 setOpenStatus("Fermé aujourd'hui")
             } else if (today.includes('Ouvert 24h/24')) {
@@ -41,15 +44,26 @@ export default function Bar(props) {
                     const [startHour, endHour] = timeSlot.split(' – ')
                     let [start, end] = timeSlot.split(' – ').map((slot) => parseInt(slot.replace(':', '')))
 
-                    // if it closes after midnight, consider it as the next day
+                    // if it closes after midnight, it's the next day
                     end = end < start ? end + 2400 : end;
 
                     if (currentTime >= start && currentTime <= end) {
                         setOpenStatus(`Ouvert jusqu'à ${endHour}`)
-                        break // Once we find an open slot, no need to check further
+                        break
                     } else {
                         setOpenStatus(`${startHour} - ${endHour}`)
                     }
+                }
+            }
+
+            // Check if the closing time of the previous day extends past midnight
+            const prevDay = (currentDay - 1 + 7) % 7; // Ensure we get a positive value for the previous day
+            const prevDayClosingTime = openingHours[prevDay.toString()]?.split(' – ')[1];
+
+            if (prevDayClosingTime) {
+                const [prevDayEndHour] = prevDayClosingTime.split(':').map(Number);
+                if (prevDayEndHour >= 0 && prevDayEndHour <= 4) {
+                    setOpenStatus(`Ouvert jusqu'à ${prevDayClosingTime}`);
                 }
             }
         }
