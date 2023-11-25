@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { FaRegStar, FaStar, FaStarHalfAlt } from 'react-icons/fa';
 
 export default function Bar(props) {
-    const [isOpen, setIsOpen] = useState(false)
     const [openStatus, setOpenStatus] = useState("Fermé")
 
     /* RATING STARS */
@@ -32,10 +31,8 @@ export default function Bar(props) {
             const today = openingHours[currentDay]
             if (today.includes('Fermé')) {
                 setOpenStatus("Fermé aujourd'hui")
-                setIsOpen(false)
             } else if (today.includes('Ouvert 24h/24')) {
                 setOpenStatus("Ouvert 24h/24")
-                setIsOpen(true)
             } else {
                 const timeSlots = today.replace(/^[a-zA-Z]+: /, '').split(', ')
                 const currentTime = currentDate.getHours() * 100 + currentDate.getMinutes()
@@ -49,11 +46,9 @@ export default function Bar(props) {
 
                     if (currentTime >= start && currentTime <= end) {
                         setOpenStatus(`Ouvert jusqu'à ${endHour}`)
-                        setIsOpen(true)
                         break // Once we find an open slot, no need to check further
                     } else {
                         setOpenStatus(`${startHour} - ${endHour}`)
-                        setIsOpen(false)
                     }
                 }
             }

@@ -3,7 +3,7 @@ import ThemeSwitcher from './ThemeSwitcher';
 
 export default function Navbar() {
     return (
-        <nav className="z-20 flex w-full flex-col items-start gap-4 p-4 text-[28px] shadow-md transition-colors lg:flex-row lg:items-center lg:justify-between">
+        <nav className="ui-primary z-20 flex w-full flex-col items-start gap-4 p-4 text-[28px] shadow-md transition-colors lg:flex-row lg:items-center lg:justify-between">
             <h2 className="flex items-center gap-1">
                 <span className="pr-2">🍻</span>
                 <span className="tx-inverted hover:tx-primary">Brest</span>
