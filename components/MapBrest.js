@@ -1,19 +1,126 @@
-import React from 'react'
-import Map from 'react-map-gl';
+import React, { useEffect } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import mapboxgl from 'mapbox-gl';
 
-export default function MapBrest() {
+const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+
+const MapBrest = ({ barsData }) => {
+    useEffect(() => {
+        mapboxgl.accessToken = TOKEN;
+
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/dark-v11',
+            center: [-4.48, 48.39],
+            zoom: 9
+        });
+
+        map.on('load', () => {
+            map.addSource('bars', {
+                type: 'geojson',
+                data: {
+                    type: 'FeatureCollection',
+                    features: barsData.map(bar => ({
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: bar.location.coordinates
+                        },
+                        properties: {
+                            id: bar.id,
+                            name: bar.name,
+                            address: bar.address
+                        }
+                    }))
+                },
+                cluster: true,
+                clusterMaxZoom: 14,
+                clusterRadius: 50,
+            });
+
+            map.addLayer({
+                id: 'clusters',
+                type: 'circle',
+                source: 'bars',
+                filter: ['has', 'point_count'],
+                paint: {
+                    'circle-color': [
+                        'step',
+                        ['get', 'point_count'],
+                        '#b786ee',
+                        100,
+                        '#8454bc',
+                        750,
+                        '#b22bc0'
+                    ],
+                    'circle-radius': [
+                        'step',
+                        ['get', 'point_count'],
+                        20,
+                        100,
+                        30,
+                        750,
+                        40
+                    ]
+                }
+            });
+
+            map.addLayer({
+                id: 'cluster-count',
+                type: 'symbol',
+                source: 'bars',
+                filter: ['has', 'point_count'],
+                layout: {
+                    'text-field': ['get', 'point_count_abbreviated'],
+                    'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+                    'text-size': 12
+                }
+            });
+
+            map.addLayer({
+                id: 'unclustered-point',
+                type: 'circle',
+                source: 'bars',
+                filter: ['!', ['has', 'point_count']],
+                paint: {
+                    'circle-color': '#11b4da',
+                    'circle-radius': 4,
+                    'circle-stroke-width': 1,
+                    'circle-stroke-color': '#fff'
+                }
+            });
+
+            map.on('click', 'clusters', (e) => {
+                const features = map.queryRenderedFeatures(e.point, {
+                    layers: ['clusters']
+                });
+                const clusterId = features[0].properties.cluster_id;
+                map.getSource('bars').getClusterExpansionZoom(
+                    clusterId,
+                    (err, zoom) => {
+                        if (err) return;
+
+                        map.easeTo({
+                            center: features[0].geometry.coordinates,
+                            zoom: zoom
+                        });
+                    }
+                );
+            });
+
+            map.on('click', 'unclustered-point', (e) => {
+                const coordinates = e.features[0].geometry.coordinates;
+
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .addTo(map);
+            });
+        });
+    }, [barsData]);
+
     return (
-        <Map
-            className="!absolute top-0 left-0 right-0 h-screen w-screen bg-gray-secondary mapboxgl-map"
-            mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
-            initialViewState={{
-                longitude: -4.48,
-                latitude: 48.39,
-                zoom: 9
-            }}
-            style={{ width: "100%", height: "100vh" }}
-            mapStyle="mapbox://styles/lydiep/clpesaawo00dp01qt6u2gdx5m"
-        />
-    )
-}
+        <div id="map" style={{ width: '100%', height: '100vh' }}></div>
+    );
+};
+
+export default MapBrest;
