@@ -6,7 +6,7 @@ export default function MapBrest() {
     return (
         <Map
             className="!absolute top-0 left-0 right-0 h-screen w-screen bg-gray-secondary mapboxgl-map"
-            mapboxAccessToken={process.env.MAPBOX_TOKEN}
+            mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
             initialViewState={{
                 longitude: -4.48,
                 latitude: 48.39,

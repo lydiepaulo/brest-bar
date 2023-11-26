@@ -24,14 +24,11 @@ export default function Bar(props) {
     useEffect(() => {
         const openingHours = JSON.parse(props.opening_hours.replace(/'/g, '"'))
 
-        console.log(openingHours);
-
         const currentDate = new Date()
         const currentDay = ((currentDate.getDay() + 5) % 7) + 1 // Sunday is 6, Monday is 0
 
         if (openingHours && openingHours[currentDay]) {
             const today = openingHours[currentDay]
-            console.log(currentDay, today);
             if (today.includes('Fermé')) {
                 setOpenStatus("Fermé aujourd'hui")
             } else if (today.includes('Ouvert 24h/24')) {
