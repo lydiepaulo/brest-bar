@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useTheme } from 'next-themes';
-import 'mapbox-gl/dist/mapbox-gl.css';
 import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -100,6 +100,7 @@ const MapBrest = ({ barsData, mapRef }) => {
             });
 
             map.on('click', 'clusters', (e) => {
+                // Click on a cluster
                 const features = map.queryRenderedFeatures(e.point, {
                     layers: ['clusters']
                 });
@@ -118,10 +119,12 @@ const MapBrest = ({ barsData, mapRef }) => {
             });
 
             map.on('click', 'unclustered-point', (e) => {
+                // Click on a point
                 const coordinates = e.features[0].geometry.coordinates;
 
                 new mapboxgl.Popup()
                     .setLngLat(coordinates)
+                    .setHTML('<h3 style="color: black">' + e.features[0].properties.name + '</h3><p style="color: black">' + e.features[0].properties.address + '</p>')
                     .addTo(map);
             });
         });
