@@ -1,12 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Bar from './Bar';
 import Navbar from './Navbar';
 import MapBrest from './MapBrest';
 
 function Home() {
+  const mapRef = useRef(null);
+
   const [bars, setBars] = useState([]);
   const [openFilter, setOpenFilter] = useState('all');
   const [visibleBars, setVisibleBars] = useState(5);
+
+  // zoomToBarLocation function
+  const zoomToBarLocation = (coordinates) => {
+    if (mapRef.current) {
+      mapRef.current.easeTo({
+        center: coordinates,
+        zoom: 15,  // You can adjust the zoom level as needed
+      });
+    }
+  };
 
   useEffect(() => {
     fetch('https://api.brest.bar/items/bars')
@@ -20,7 +32,9 @@ function Home() {
     ? bars.filter(bar => bar.isOpen)
     : bars;
 
-  const visibleBarList = sortedBars.slice(0, visibleBars).map((data, i) => <Bar key={i} {...data} />);
+  const visibleBarList = sortedBars.slice(0, visibleBars).map((data, i) => (
+    <Bar key={i} zoomToLocation={zoomToBarLocation} {...data} />
+  ));
 
   const loadMore = () => {
     setVisibleBars(prevVisibleBars => prevVisibleBars + 5);
@@ -73,7 +87,7 @@ function Home() {
 
       {/* map */}
       <div className="!absolute z-0 top-0 left-0 right-0 w-[100%] h-[100%] bg-gray-secondary mapboxgl-map">
-        <MapBrest barsData={bars} />
+        <MapBrest barsData={bars} mapRef={mapRef} />
       </div>
     </div>
   );

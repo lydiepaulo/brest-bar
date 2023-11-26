@@ -1,19 +1,28 @@
 import React, { useEffect } from 'react';
+import { useTheme } from 'next-themes';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import mapboxgl from 'mapbox-gl';
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
-const MapBrest = ({ barsData }) => {
+const MapBrest = ({ barsData, mapRef }) => {
+    const { theme, setTheme } = useTheme();
+
     useEffect(() => {
         mapboxgl.accessToken = TOKEN;
 
-        const map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/dark-v11',
-            center: [-4.48, 48.39],
-            zoom: 9
-        });
+        // Fonction pour créer la carte
+        const createMap = () => {
+            return new mapboxgl.Map({
+                container: 'map',
+                style: theme === "dark" ? 'mapbox://styles/lydiep/clpf42epj00ei01pjd7kg2oe5' : 'mapbox://styles/lydiep/clpf47qba00ea01pag9k45mln',
+                center: [-4.48, 48.39],
+                zoom: 9
+            });
+        };
+
+        const map = createMap();
+        mapRef.current = map;
 
         map.on('load', () => {
             map.addSource('bars', {
@@ -116,7 +125,12 @@ const MapBrest = ({ barsData }) => {
                     .addTo(map);
             });
         });
-    }, [barsData]);
+
+        // Gestion du changement de thème
+        return () => {
+            map.remove(); // Supprimer la carte lors du démontage du composant
+        };
+    }, [barsData, mapRef, setTheme, theme]);
 
     return (
         <div id="map" style={{ width: '100%', height: '100vh' }}></div>

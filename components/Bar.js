@@ -66,14 +66,20 @@ export default function Bar(props) {
         }
     }, [props.opening_hours]);
 
+    // zoom on location
+    const handleCardClick = () => {
+        const { coordinates } = props.location;
+        props.zoomToLocation(coordinates);
+    };
+
     return (
-        <div className="ui-secondary flex flex-col rounded-2xl gap-2 p-6 my-6">
+        <div className="ui-secondary flex flex-col rounded-2xl gap-2 p-6 my-6 hover:scale-[1.02] transition-transform" onClick={handleCardClick}>
             <h4 className="tx-primary flex gap-2 items-center">
                 <span className="flex">{ratingStar}</span> ({props.rating}/5, {props.user_ratings_total} votes)
             </h4>
             <h3 className="tx-inverted text-2xl font-bold">{props.name}</h3>
             <p className="tx-primary">🏃‍♂️ {props.address}</p>
-            {openStatus}
+            <span className="bg-tertiary tx-tertiary w-fit px-2 rounded">{openStatus}</span>
         </div>
     );
 }
