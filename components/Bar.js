@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaRegStar, FaStar, FaStarHalfAlt } from 'react-icons/fa';
 
 export default function Bar(props) {
-    const [openStatus, setOpenStatus] = useState("Fermé")
+    const [openStatus, setOpenStatus] = useState("Fermé");
 
     /* RATING STARS */
     const ratingStar = Array.from({ length: 5 }, (e, i) => {
@@ -21,46 +21,64 @@ export default function Bar(props) {
     });
 
     /* OPENING HOURS */
-    useEffect(() => {
-        const openingHours = JSON.parse(props.opening_hours.replace(/'/g, '"'))
 
-        const currentDate = new Date()
-        const currentDay = ((currentDate.getDay() + 5) % 7) + 1 // Sunday is 6, Monday is 0
+    // function to format hours and minutes
+    const formatTime = (hour, minute) => {
+        return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+    };
+
+    useEffect(() => {
+        const currentDate = new Date();
+        const currentDay = ((currentDate.getDay() + 5) % 7) + 1; // Sunday is 6, Monday is 0, …
+
+        // from json to object to manipulate the data
+        const openingHours = JSON.parse(props.opening_hours.replace(/'/g, '"'));
+
+        // get previous day
+        const prevDay = (currentDay - 1 + 7) % 7; // Sunday is 6, Monday is 0, … + ensures that we don't end up with a negative number
+        const prevDayClosingTime = openingHours?.[prevDay.toString()]?.split(' – ')[1];
 
         if (openingHours && openingHours[currentDay]) {
-            const today = openingHours[currentDay]
-            if (today.includes('Fermé')) {
-                setOpenStatus("Fermé aujourd'hui")
-            } else if (today.includes('Ouvert 24h/24')) {
-                setOpenStatus("Ouvert 24h/24")
-            } else {
-                const timeSlots = today.replace(/^[a-zA-Z]+: /, '').split(', ')
-                const currentTime = currentDate.getHours() * 100 + currentDate.getMinutes()
+            // get currentDay hours
+            const today = openingHours[currentDay];
 
-                for (const timeSlot of timeSlots) {
-                    const [startHour, endHour] = timeSlot.split(' – ')
-                    let [start, end] = timeSlot.split(' – ').map((slot) => parseInt(slot.replace(':', '')))
-
-                    // if it closes after midnight, it's the next day
-                    end = end < start ? end + 2400 : end;
-
-                    if (currentTime >= start && currentTime <= end) {
-                        setOpenStatus(`Ouvert jusqu'à ${endHour}`)
-                        break
-                    } else {
-                        setOpenStatus(`${startHour} - ${endHour}`)
-                    }
-                }
-            }
-
-            // Check if the closing time of the previous day extends past midnight
-            const prevDay = (currentDay - 1 + 7) % 7; // Ensure we get a positive value for the previous day
-            const prevDayClosingTime = openingHours[prevDay.toString()]?.split(' – ')[1];
-
+            // First, we check if the closing time of the previous day extends past midnight
             if (prevDayClosingTime) {
-                const [prevDayEndHour] = prevDayClosingTime.split(':').map(Number);
-                if (prevDayEndHour >= 0 && prevDayEndHour <= 4) {
-                    setOpenStatus(`Ouvert jusqu'à ${prevDayClosingTime}`);
+                const [prevDayEndHour, prevDayEndMinute] = prevDayClosingTime.split(':').map(Number);
+                const prevDayEndTime = prevDayEndHour * 60 + prevDayEndMinute;
+
+                const timeSlots = today.replace(/^[a-zA-Z]+: /, '').split(', ');
+                const currentTime = currentDate.getHours() * 60 + currentDate.getMinutes();
+
+                // if today is closed
+                if (today.includes('Fermé')) {
+                    setOpenStatus("Fermé aujourd'hui");
+
+                    // except if it's still open from yesterday : 240 is midnight
+                    if (currentTime >= prevDayEndTime && currentTime <= 240) {
+                        setOpenStatus(`Ouvert jusqu'à ${formatTime(prevDayEndHour, prevDayEndMinute)}`);
+                    }
+                } else if (today.includes('Ouvert 24h/24')) {
+                    setOpenStatus("Ouvert 24h/24");
+                } else {
+                    // handle today
+                    for (const timeSlot of timeSlots) {
+                        const [startHour, startMinute, endHour, endMinute] = timeSlot.split(' – ')
+                            .flatMap(time => time.split(':').map(Number));
+
+                        const start = startHour * 60 + startMinute;
+                        let end = endHour * 60 + endMinute;
+
+                        // if it closes after midnight, it's the next day
+                        end = end < start ? end + 1440 : end;
+
+                        if (currentTime >= start && currentTime <= end) {
+                            setOpenStatus(`Ouvert jusqu'à ${formatTime(endHour, endMinute)}`);
+                            break;
+                        } else {
+                            setOpenStatus(`Ouvre à ${formatTime(startHour, startMinute)}`);
+                        }
+                    }
                 }
             }
         }

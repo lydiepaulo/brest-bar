@@ -7,7 +7,7 @@ function Home() {
   const mapRef = useRef(null);
 
   const [bars, setBars] = useState([]);
-  const [openFilter, setOpenFilter] = useState('all');
+  const [filter, setFilter] = useState('all');
   const [visibleBars, setVisibleBars] = useState(5);
 
   // zoomToBarLocation function
@@ -28,8 +28,8 @@ function Home() {
       });
   }, []);
 
-  const sortedBars = openFilter === 'open'
-    ? bars.filter(bar => bar.isOpen)
+  const sortedBars = filter === 'rating'
+    ? bars.slice().sort((a, b) => b.rating - a.rating)
     : bars;
 
   const visibleBarList = sortedBars.slice(0, visibleBars).map((data, i) => (
@@ -41,12 +41,12 @@ function Home() {
   };
 
   const sortAll = () => {
-    setOpenFilter('all');
+    setFilter('all');
     setVisibleBars(5); // Reset visible bars when changing the filter
   };
 
   const sortOpen = () => {
-    setOpenFilter('open');
+    setFilter('rating');
     setVisibleBars(5); // Reset visible bars when changing the filter
   };
 
@@ -69,7 +69,7 @@ function Home() {
               <span className="text-4xl">🍺</span> <span>Tous</span>
             </button>
             <button className="tri-buttons" onClick={sortOpen}>
-              <span className="text-4xl">🍹</span> <span>Ouverts</span>
+              <span className="text-4xl">🍹</span> <span>Les mieux notés</span>
             </button>
           </div>
         </div>
