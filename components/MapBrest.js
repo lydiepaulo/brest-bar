@@ -13,7 +13,7 @@ export default function MapBrest() {
                 zoom: 9
             }}
             style={{ width: "100%", height: "100vh" }}
-            mapStyle="mapbox://styles/mapbox/streets-v9"
+            mapStyle="mapbox://styles/lydiep/clpesaawo00dp01qt6u2gdx5m"
         />
     )
 }
