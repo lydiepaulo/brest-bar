@@ -2,20 +2,31 @@ import { useEffect, useState, useRef } from 'react';
 import Bar from './Bar';
 import Navbar from './Navbar';
 import MapBrest from './MapBrest';
+import Modal from './Modal';
 
-function Home() {
+export default function Home() {
   const mapRef = useRef(null);
 
   const [bars, setBars] = useState([]);
   const [filter, setFilter] = useState('all');
   const [visibleBars, setVisibleBars] = useState(5);
 
+  const [showModal, setShowModal] = useState(false);
+
+  // ASK MODAL
+  const openModal = () => {
+    setShowModal(!showModal);
+  };
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
   // zoomToBarLocation function
   const zoomToBarLocation = (coordinates) => {
     if (mapRef.current) {
       mapRef.current.easeTo({
         center: coordinates,
-        zoom: 15,  // You can adjust the zoom level as needed
+        zoom: 15,
       });
     }
   };
@@ -47,12 +58,15 @@ function Home() {
 
   const sortOpen = () => {
     setFilter('rating');
-    setVisibleBars(5); // Reset visible bars when changing the filter
+    setVisibleBars(5);
   };
 
   return (
     <div className="flex max-h-screen min-h-screen flex-col overflow-hidden">
-      <Navbar />
+
+      {/* navbar & modal */}
+      <Navbar openModal={openModal} />
+      {showModal && <Modal showModal={showModal} closeModal={closeModal} />}
 
       {/* left bar */}
       <div className='ui-primary custom-scrollbar relative z-10 min-h-full flex-1 shadow-xl transition-all lg:w-1/3 w-4/5 overflow-y-scroll'>
@@ -92,5 +106,3 @@ function Home() {
     </div>
   );
 }
-
-export default Home;
