@@ -11,7 +11,7 @@ const MapBrest = ({ barsData, mapRef }) => {
     useEffect(() => {
         mapboxgl.accessToken = TOKEN;
 
-        // Fonction pour créer la carte
+        // Create the map
         const createMap = () => {
             return new mapboxgl.Map({
                 container: 'map',
@@ -129,9 +129,9 @@ const MapBrest = ({ barsData, mapRef }) => {
             });
         });
 
-        // Gestion du changement de thème
+        // change the theme
         return () => {
-            map.remove(); // Supprimer la carte lors du démontage du composant
+            map.remove(); // remove the card
         };
     }, [barsData, mapRef, setTheme, theme]);
 

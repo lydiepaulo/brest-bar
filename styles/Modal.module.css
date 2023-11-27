@@ -1,9 +1,8 @@
 .modal {
 	opacity: 0;
-	transition: opacity 3s;
+	transition: opacity 1s;
 }
 
 .modal.show {
 	opacity: 1;
-	transition: opacity 3s;
 }
