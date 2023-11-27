@@ -5,7 +5,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
-const MapBrest = ({ barsData, mapRef }) => {
+export default function MapBrest({ barsData, mapRef }) {
     const { theme, setTheme } = useTheme();
 
     useEffect(() => {
@@ -130,6 +130,16 @@ const MapBrest = ({ barsData, mapRef }) => {
         });
 
         // change the theme
+        const handleThemeChange = (newTheme) => {
+            map.setStyle(newTheme === "dark" ? 'mapbox://styles/lydiep/clpf42epj00ei01pjd7kg2oe5' : 'mapbox://styles/lydiep/clpf47qba00ea01pag9k45mln');
+        };
+
+        // listen to theme change events
+        setTheme((currentTheme) => {
+            handleThemeChange(currentTheme);
+            return currentTheme;
+        });
+
         return () => {
             map.remove(); // remove the card
         };
@@ -139,5 +149,3 @@ const MapBrest = ({ barsData, mapRef }) => {
         <div id="map" style={{ width: '100%', height: '100vh' }}></div>
     );
 };
-
-export default MapBrest;
