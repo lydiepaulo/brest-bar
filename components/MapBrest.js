@@ -4,6 +4,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+const FIRST_VISIT_FLAG = 'firstVisit';
 
 export default function MapBrest({ barsData, mapRef }) {
     const { theme, setTheme } = useTheme();
@@ -11,17 +12,24 @@ export default function MapBrest({ barsData, mapRef }) {
     useEffect(() => {
         mapboxgl.accessToken = TOKEN;
 
-        // Create the map
-        const createMap = () => {
-            return new mapboxgl.Map({
-                container: 'map',
-                style: theme === "dark" ? 'mapbox://styles/lydiep/clpf42epj00ei01pjd7kg2oe5' : 'mapbox://styles/lydiep/clpf47qba00ea01pag9k45mln',
-                center: [-4.48, 48.39],
-                zoom: 9
-            });
-        };
+        // Check if it's the first visit
+        const isFirstVisit = localStorage.getItem(FIRST_VISIT_FLAG) === null;
 
-        const map = createMap();
+        // If it's the first visit, set the theme based on user's color scheme preference
+        if (isFirstVisit) {
+            const userColorScheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            setTheme(userColorScheme);
+            localStorage.setItem(FIRST_VISIT_FLAG, 'visited');
+        }
+
+        // Create the map
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: theme === 'dark' ? 'mapbox://styles/lydiep/clpf42epj00ei01pjd7kg2oe5' : 'mapbox://styles/lydiep/clpf47qba00ea01pag9k45mln',
+            center: [-4.48, 48.39],
+            zoom: 9,
+        });
+
         mapRef.current = map;
 
         map.on('load', () => {
@@ -130,20 +138,10 @@ export default function MapBrest({ barsData, mapRef }) {
         });
 
         // change the theme
-        const handleThemeChange = (newTheme) => {
-            map.setStyle(newTheme === "dark" ? 'mapbox://styles/lydiep/clpf42epj00ei01pjd7kg2oe5' : 'mapbox://styles/lydiep/clpf47qba00ea01pag9k45mln');
-        };
-
-        // listen to theme change events
-        setTheme((currentTheme) => {
-            handleThemeChange(currentTheme);
-            return currentTheme;
-        });
-
         return () => {
             map.remove(); // remove the card
         };
-    }, [barsData, mapRef, setTheme, theme]);
+    }, [barsData, mapRef, theme]);
 
     return (
         <div id="map" style={{ width: '100%', height: '100vh' }}></div>

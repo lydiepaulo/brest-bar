@@ -33,7 +33,7 @@ export default function Bar(props) {
 
         // from json to object to manipulate the data
         const openingHours = JSON.parse(props.opening_hours.replace(/'/g, '"'));
-        console.log(openingHours)
+
         // get previous day
         const prevDay = (currentDay + 5) % 7; // Sunday is 6, Monday is 0, … + ensures that we don't end up with a negative number
         const prevDayClosingTime = openingHours?.[prevDay.toString()]?.split(' – ')[1];
